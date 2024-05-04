@@ -1,36 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+
+import { StyleSheet, Text, View, TextInput, Button, ScrollView, Pressable } from 'react-native';
 import { useState,} from 'react'
-// import TaskManager from './TaskManager.js';
-/*  const [task, setTask] = useState(
-      {
-          id: "",
-          title:"",
-          completed:""
-      }
-
-        function addTask(){
-    setId(tid + 1);
-    updatedValue={
-      id: tid,
-      title: "Math Test" + tid,
-      completed: false
-    };
-
-      <Button
-    
-   title="addTask"
-   onPress= {() => {addTask()}}>
-   
-  </Button>
-      <Text style={{padding: 10, fontSize: 42}}>
-    {tname
-    .split(' ')
-    .map(word => word && 'hello')
-    .join('')}
-    </Text>
-    ✔
-  */
+// import { TaskManager } from './TaskManager.js';
 function TaskManager(){
   const initialList =[
     {
@@ -67,18 +38,36 @@ function TaskManager(){
     };
     setTask(updatedValue);
     const newList = () => ([...taskList, updatedValue]);
-    // newList (updatedValue);
-    // setTaskList(newList);
     setTaskList(newList);
     console.log(taskList);
   }
 
-  function toggleTask()
+  function toggleTaskCompletion(completedTask, taskList)
   {
-      //newUpdate = {...updatedTask};
-      //newUpdate.completed = !updatedTask.completed;
-      const toggle = (index) => {setTaskList(taskList.map((task, idx) => idx === index?task.completed = !task.completed:''))};
-      console.log(taskList);
+      // first create a new object from the task to be toggled with the
+      //    toggle update (completed field)
+      updatedValue =
+      {
+        id: completedTask.id,
+        title: completedTask.title,
+        completed: !completedTask.completed
+
+      }
+
+      // grab the id for the task to toggle
+      const idChange = completedTask.id;
+
+      //  grab a list of all of the tasks that come before the task to update in the list
+      const firstElements = taskList.filter(idx => (idx === undefined || idx.id < idChange));
+
+      //  grab a list of all of the tasks that come after the task to update in the list
+      const lastElements = taskList.filter(idx => (idx === undefined || idx.id > idChange));
+
+      //  combine the two lists with the new updated task
+      const newList = [...firstElements, updatedValue, ...lastElements];
+
+      // set the task list to the new combined tasks
+      setTaskList(newList);
   }
 
   return(
@@ -105,14 +94,13 @@ function TaskManager(){
   <View style={styles.taskStyle}>
   {taskList.map((task, index) => 
   <Text
-    key={index}>{task.id}: {task.title} {task.completed?"✔":"X"}
+    key={index}>{task.id}: {task.title} {task.completed?" [✔] ":" [X] "}
     <Button
+     color= 'red'
      title="complete"
      defaultValue={setTask}
-     onPress={() => toggleTask(index)}
+     onPress={() => toggleTaskCompletion(task, taskList)}
     >
-      
-
     </Button>
   </Text>)}
   </View>
@@ -120,12 +108,19 @@ function TaskManager(){
   );
 };
 
+
 export default function App() {
   return (
+    <ScrollView 
+      style={styles.scrollView}
+      alwaysBounceVertical
+      automaticallyAdjustContentInsets>
+
     <View style={styles.container}>
+      
       <TaskManager /> 
-      <StatusBar style="auto" />
     </View>
+    </ScrollView>
   );
 }
 
@@ -146,9 +141,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10
   },
+
+  scrollView:{
+    paddingVertical:200
+    },
+
   taskStyle:{
     margin: 50,
     alignItems:'flex-start',
     textAlign:'left'
-  }
+  },
 });

@@ -1,52 +1,109 @@
-import {useState, useCallback, View, Text, Button, TextInput} from 'react'
+import {useState, useCallback, View, Text, Button, TextInput, StyleSheet} from 'react'
+import styles from './App'
 
-export function Taskmanager(){
-    // const [tinput, setTinput] = useState("Hello");
+function TaskManager(){
+    const initialList =[
+      {
+          id: "",
+          title:"",
+          completed:false
+      }
+    ]; 
     // An Array to store tasks
   
-    return(
-    <>
-    <TextInput
-     placeholder="Add New Task..."
-     value=""
-     > HELLO
+    // Constant for checkmark status
+    const[checked, setCheck]= useState(false);
   
-    </TextInput>
-    </>
-    );
-  };
-/*
- function Taskmanager(){
-
-    // An Array to store tasks
-    const[tasks, setTasks] = useState([]); 
-    let tinput;
-    const [task, setTask] = useState(
-        {
-            id: "",
-            title:"",
-            completed:""
-        }
-    )
+    // Constant for task setting 
+    const[task, setTask]= useState({});
+  
+    // Constant for id setting
+    const[tid, setId] = useState(1);
+  
+    // Constant for list of tasks
+    const[taskList, setTaskList] = useState([]);
+    const[tname, setTaskName] = useState(''); 
+    // let tinput="3";
+    //const handleChange = () => {setCheck(!checked);};
+  
+    // let updatedValue={};
     function addTask(){
-      console.log(tinput);
+      setTaskName(tname);
+      setId(tid + 1);
+      updatedValue={
+        id: tid,
+        title: tname,
+        completed: false
+      };
+      setTask(updatedValue);
+      const newList = () => ([...taskList, updatedValue]);
+      setTaskList(newList);
+      console.log(taskList);
     }
-
-
+  
+    function toggleTaskCompletion(completedTask, taskList)
+    {
+        // first create a new object from the task to be toggled with the
+        //    toggle update (completed field)
+        updatedValue =
+        {
+          id: completedTask.id,
+          title: completedTask.title,
+          completed: !completedTask.completed
+  
+        }
+  
+        // grab the id for the task to toggle
+        const idChange = completedTask.id;
+  
+        //  grab a list of all of the tasks that come before the task to update in the list
+        const firstElements = taskList.filter(idx => (idx === undefined || idx.id < idChange));
+  
+        //  grab a list of all of the tasks that come after the task to update in the list
+        const lastElements = taskList.filter(idx => (idx === undefined || idx.id > idChange));
+  
+        //  combine the two lists with the new updated task
+        const newList = [...firstElements, updatedValue, ...lastElements];
+  
+        // set the task list to the new combined tasks
+        setTaskList(newList);
+    }
+  
     return(
     <>
+    <Text>Add Tasks!</Text>
+    
     <TextInput
+     style={styles.input}
+     onChangeText={setTaskName}
+     value={tname}
      placeholder="Add New Task..."
-     value={tinput}
+     // clearTextOnFocus
+     clearButtonMode = 'while-editing'
      >
-
     </TextInput>
+     <Text>[{tname}]</Text>
+    
     <Button
-     title="addTask">
-     onPress{() => {addTask}}
+     title="addTask"
+     defaultValue={task}
+     onPress= {addTask}>
     </Button>
+  
+    <View style={styles.taskStyle}>
+    {taskList.map((task, index) => 
+    <Text
+      key={index}>{task.id}: {task.title} {task.completed?" [✔] ":" [X] "}
+      <Button
+       color= 'red'
+       title="complete"
+       defaultValue={setTask}
+       onPress={() => toggleTaskCompletion(task, taskList)}
+      >
+      </Button>
+    </Text>)}
+    </View>
     </>
     );
-};
-
-*/
+  }
+  export default TaskManager;
